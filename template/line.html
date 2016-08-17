@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>ichartjs 示例</title>
+		<meta name="Description" content="The ichartjs's gallery center,ichartjs 示例中心" />
+		<meta name="Keywords" content="ichartjs demo,Html5 demo,ichartjs示例,ichartjs示例,Html5示例,Html5示例" />
+		<script src='/static/js/ichart.1.2.1.min.js'></script>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+		<script src="/static/laydate/laydate.js"></script>
+		<script type="text/javascript">
+		$(function(){
+			var flow= {{ flow|safe}};
+            var end={{ end|safe }};
+            var scale = {{ scale|safe }};
+			var text = {{ program|safe }};
+
+			var data = [
+			         	{
+			         		name : '费用',
+			         		value:flow,
+			         		color:'#3bc0ff',
+			         		line_width:1
+			         	}
+			         ];
+
+			var labels = {{ labels|safe }};
+
+			var chart = new iChart.LineBasic2D({
+				render : 'canvasDiv',
+				data: data,
+				align:'center',
+				animation:Boolean,
+				showpercent: Boolean,
+				animation_timing_function: 'easeInOut',
+				//title : {
+					//text:'ichartjs官方网站上一日PV流量',
+					//font : '微软雅黑',
+					//fontsize:24,
+					//color:'#b4b4b4'
+				//},
+				//subtitle : {
+					//text:'14:00-16:00访问量达到最大值',
+					//font : '微软雅黑',
+					//color:'#b4b4b4'
+				//},
+				footnote : {
+					text: text,
+					font : '微软雅黑',
+				    textAlign:"center",
+					fontsize:11,
+					fontweight:600,
+					padding:'0 28',
+					color:'#000000'
+				},
+				width : 700,
+				height : 500,
+				shadow:false,
+				shadow_color : '#202020',
+				shadow_blur : 8,
+				shadow_offsetx : 0,
+				animation:Boolean,
+				shadow_offsety : 0,
+				background_color:'#ffffff',
+				tip:{
+					enable:true,
+					shadow:true,
+					listeners:{
+						 //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+						parseText:function(tip,name,value,text,i){
+														var f = new String(value);
+							f = f.split("").reverse().join("").replace(/(\d{3})/g,"$1,").split("").reverse();
+							if(f[0]==','){
+								f.shift();
+							}
+							f = f.join("");
+							return "<span style='color:#005268;font-size:12px;'>"+labels[i]+" 费用为:<br/>"+
+							"</span><span style='color:#005268;font-size:20px;'>"+f+"元</span>";
+						}
+					}
+				},
+				crosshair:{
+					enable: true,
+					line_color:'#3bc0ff'
+				},
+				sub_option : {
+					smooth : true,
+					label:false,
+					intersection: false,
+					hollow:false,
+					hollow_inside:false,
+					point_size:8
+				},
+				coordinate:{
+					width:550,
+					height:360,
+					striped_factor : 0.18,
+					grid_color:'#ffffff',
+					axis:{
+						color:'#9d987a',
+						width:[0,0,4,4]
+					},
+					scale:[{
+						 position:'left',
+						 start_scale:0,
+						 end_scale: end,
+						 scale_space: scale,
+						 scale_size:2,
+						 scale_enable : true,
+						 label : {color:'#000000',font : '微软雅黑',fontsize:6 ,fontweight:400},
+						 scale_color:'#000000'
+					},{
+						 position:'bottom',
+						 label : {color:'#000000',font : '微软雅黑',fontsize:6 ,fontweight:400,textBaseline:'bottom',textAign:'start',rotate:45},
+						 scale_enable : false,
+						 labels:labels
+					}]
+				}
+			});
+			//利用自定义组件构造左侧说明文本
+			chart.plugin(new iChart.Custom({
+					drawFn:function(){
+						//计算位置
+						var coo = chart.getCoordinate(),
+							x = coo.get('originx'),
+							y = coo.get('originy'),
+							w = coo.width,
+							h = coo.height;
+						//在左上侧的位置，渲染一个单位的文字
+						chart.target.textAlign('start')
+						.textBaseline('bottom')
+						.textFont('600 11px 微软雅黑')
+						.fillText('费用(元)',x-40,y-12,false,'#000000')
+						.textBaseline('top')
+						.fillText('(日期)',x+w+12,y+h+10,false,'#000000');
+
+					}
+			}));
+		//开始画图
+		chart.draw();
+	});
+	</script>
+</head>
+<body>
+            <form action="/line/" method="post" id="formid">
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <select name="three"  id="selectone">
+             <% request.setCharacterEncoding("utf-8");%>
+             <option value="所有游戏业务项目" {{ all }}>所有游戏业务项目</option>
+                    {% for key,value in projectname.items %}
+			{% ifequal key  projectid %}
+             <option value={{ key }}   selected="selected" >{{ value }}</option>
+			{% else %}
+				<option value={{ key }}  >{{ value }}</option>
+			{% endifequal %}
+                    {% endfor %}
+                    </select>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value={{ one }}>到<input id="hello1" class="laydate-icon" name="two" value={{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary">提交</button>
+            </form>
+	<div id='canvasDiv'></div>
+</body>
+
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello1', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+
+
+<script>
+ $("#selectone").change(function(){
+      document.getElementById('formid').submit()
+
+ });
+</script>
+
+</html>

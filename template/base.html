@@ -1,84 +1,211 @@
 <!DOCTYPE html>
 <html>
-<title>CMDB</title>
-<head>
-    <meta charset="UTF-8">
-    <link href="//cdn.bootcss.com/bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
-   <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-   <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<head>
+		<meta charset="UTF-8" />
+        <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+		<title>费用</title>
+		<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+		<script src='/static/js/ichart.1.2.1.min.js'></script>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+        <script src="/static/layer/layer.js"></script>
+        <script src="/static/laydate/laydate.js"></script>
+        {% block barcanvscript %} {% endblock %}
 </head>
-<body>
-
-<div class="row clearfix">
-		<div class="col-md-12 column">
-            <div class="panel panel-primary">
-                       <div class="panel-heading" >
-                             <h3 class="panel-title"><span><img src="/static/img/logo.png" alt="logo"></span>
+<body style='background-color:#fcfcfc;'>
+<div class="panel panel-primary">
+<div class="panel-heading">
+<h3 class="panel-title"><span><img src="/static/img/logo.png" alt="logo"></span>
     <div class="btn-group pull-right" style="background-color: aliceblue">
                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">username</span>
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{ username }}</span>
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="/logout/">Logout</a></li>
+                    <li><a href="/weblogout/">Logout</a></li>
                 </ul>
            </div>
 </h3>
-                         </div>
+
+
+</div>
+<div class="panel-body">
+	<div id="content" class="row-fluid">
+        <div class="col-md-2">
+                <div class="panel-group table-responsive" role="tablist">
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                                 <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="#">&nbsp;&nbsp;导航</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/showall/"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;游戏项目费用总览</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/excel/"><span class="glyphicon glyphicon-th"></span>&nbsp;导出数据EXCEL表</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading">
+                            <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/admin/"><span class="glyphicon glyphicon-wrench"></span>&nbsp;权限管理</a></li>
+                                </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading" id="collapseListGroupHeading2" data-toggle="collapse" data-target="#collapseListGroup2" role="tab" >
+                            <h5 class="panel-title">
+                                &nbsp;&nbsp;
+                                <span class="glyphicon glyphicon-globe"></span>
+                                网络游戏
+                                <span class="glyphicon glyphicon-chevron-down right"></span>
+                            </h5>
+                    </div>
+
+                        <div id="collapseListGroup2" class="panel-collapse collapse {{ net }}" role="tabpanel" aria-labelledby="collapseListGroupHeading2">
+                            <ul class="nav nav-pills nav-stacked">
+                                            <li><a href="/ldzw/">乱斗之王</a></li>
+                                            <li><a href="/cqb/">苍穹变</a></li>
+                                            <li><a href="#">水果忍者</a></li>
+
+                                            <li><a href="#">三剑豪</a></li>
+                                            <li><a href="#">美人计</a></li>
+                                            <li><a href="#">烈焰遮天</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary leftMenu">
+                        <div class="panel-heading" id="collapseListGroupHeading1" data-toggle="collapse" data-target="#collapseListGroup1" role="tab" >
+                            <h5 class="panel-title">
+                                &nbsp;&nbsp;
+                                <span class="glyphicon glyphicon-phone"></span>
+                                单机游戏
+                                <span class="glyphicon glyphicon-chevron-down right"></span>
+                            </h5>
+                        </div>
+                        <div id="collapseListGroup1" class="panel-collapse collapse {{ alone }}" role="tabpanel" aria-labelledby="collapseListGroupHeading1">
+                            <ul class="nav nav-pills nav-stacked">
+                                            <li><a href="/tkzz/">坦克之战</a></li>
+                                            <li><a href="#">地铁跑酷</a></li>
+                                            <li><a href="#">国宝三国</a></li>
+                                            <li><a href="#">机械王</a></li>
+                                            <li><a href="#">纪念碑谷</a></li>
+                                            <li><a href="#">HND英雄永不灭</a></li>
+                                            <li><a href="#">快乐点点消</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-		</div>
+        <div class="col-md-10 well" >
+            {% block context %}{% endblock %}
+        </div>
 </div>
 
+</div>
+</div>
 
-
-		<div class="col-md-12 column">
-			<div class="row clearfix">
-				<div class="col-md-2 column" style="background:#2f4050;"  id="two">
-                    <ul class="nav nav-pills nav-stacked nav-text" style="background:#2f4050;" >
-                           <li><a href="#"  style="color:#fff; font-size: 25px; text-align:center;">仪表盘</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">项目管理</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">用户管理</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">授权管理</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">日志审计</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">发布变更</a></li>
-                           <li><a href="#" style="color:#fff; font-size: 25px; text-align:center;">机器管理</a></li>
-                    </ul>
-
-				</div>
-				<div class="col-md-10 column">
-
-				</div>
-			</div>
-		</div>
-
-
-
-</body>
 <script>
-    var winWidth=0;
-var winHeight=0;
-//获取窗口宽度
-if (window.innerWidth){
-winWidth = window.innerWidth;
-}else if ((document.body) && (document.body.clientWidth)){
-winWidth = document.body.clientWidth;
-}
-//获取窗口高度
-if (window.innerHeight){
-winHeight = window.innerHeight;
-}else if((document.body) && (document.body.clientHeight)){
-winHeight = document.body.clientHeight;
-}
-//通过深入Document内部对body进行检测，获取窗口高度
-if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth){
-winWidth = document.documentElement.clientWidth;
-winHeight = document.documentElement.clientHeight;
-}
-
-$("#two").css({"height":parseInt(winHeight)});
-
+$('#haha').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '曲线图展示',
+                shadeClose: true,
+                offset: 'rb',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '600px'],
+                content: '/line/',
+                shift: 9
+            });
+});
 
 </script>
+<script>
+
+$('#hao').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '表格展示',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/table/',
+                shift: 9
+            });
+});
+
+</script>
+<script>
+$('#xiangmu').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '项目信息',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/information/',
+                shift: 9
+            });
+});
+
+</script>
+
+
+
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello1', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+<script>
+ $("#selectone").change(function(){
+      document.getElementById('formid').submit()
+
+ });
+</script>
+
+
+
+<script>
+$(function(){
+    $("#footerBar").children().css({"width":$(window).width()/5+"px"});
+});
+</script>
+</body>
+
 
 </html>
