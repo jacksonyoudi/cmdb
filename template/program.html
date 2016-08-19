@@ -1,0 +1,100 @@
+{% extends 'baseuser.html' %}
+
+{%  block barcanv %}
+		<script type='text/javascript'>
+    //定义数据
+	var data = {{ cost|safe }};
+	 $(function(){
+		var chart = new iChart.Column2D({
+			render : 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
+			data: data,//绑定数据
+			// title : '项目费用',//设置标题
+			width : 1200,//设置宽度，默认单位为px
+			height : 600,//设置高度，默认单位为px
+			shadow:true,//激活阴影
+            animation:Boolean, //激活动画
+            column_width: 45,
+            tip:{
+					enable:true,
+					listeners:{
+						 //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+						parseText:function(tip,name,value,text,i){
+							//将数字进行千位格式化
+							var f = new String(value);
+							f = f.split("").reverse().join("").replace(/(\d{3})/g,"$1,").split("").reverse();
+							if(f[0]==','){
+								f.shift();
+							}
+							f = f.join("");
+
+							return name+"费用:<br/>"+f+"元";
+						}
+					}
+				},
+           /* footnote:{
+                  text:"日期",
+                  color:"#000000",
+                  fontsize:18,
+                  font:"微软雅黑",
+                  textAlign:"center",
+                  height:30,
+                  offsetx:-32,
+                  offsety:0
+            },*/
+			shadow_color:'#c7c7c7',//设置阴影颜色
+			coordinate:{//配置自定义坐标轴
+				scale:[{//配置自定义值轴
+					 position:'left',//配置左值轴
+					 start_scale:0,//设置开始刻度为0
+					 end_scale:1000000,//设置结束刻度为26
+					 scale_space:100000,//设置刻度间距
+					 listeners:{//配置事件
+						parseText:function(t,x,y){//设置解析值轴文本
+							return {text:t}
+						}
+					}
+				}]
+			}
+		});
+
+                         //利用自定义组件构造左侧说明文本
+			chart.plugin(new iChart.Custom({
+					drawFn:function(){
+						//计算位置
+						var coo = chart.getCoordinate(),
+							x = coo.get('originx'),
+							y = coo.get('originy');
+						//在左上侧的位置，渲染一个单位的文字
+						chart.target.textAlign('start')
+						.textBaseline('bottom')
+						.textFont('600 11px 微软雅黑')
+						.fillText('费用(单位：元)',x-40,y-10,false,'#6d869f');
+
+					}
+			}));
+		//调用绘图方法开始绘图
+		chart.draw();
+	});
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+			  <div>
+            <form action="/program/" method="post">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: x-large;">{{ program }}</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="hello" class="laydate-icon" name="one" value= {{ one }}>到<input id="hello1" class="laydate-icon" name="two" value= {{ two }}></input>&nbsp;<button type="submit" class="btn btn-primary">提交</button>
+                <button type="button" class="btn btn-default btn-primary" id="haha">
+          <span>曲线图</span></button>
+                <button type="button" class="btn btn-default btn-primary" id="hao">
+          <span>表格</span>
+                    </button>
+                <button type="button" class="btn btn-default btn-primary" id="xiangmu">
+          <span>项目详情</span>
+                    </button>
+            </form>
+               </div>
+			<div id='canvasDiv' style="float: left"></div>
+
+{% endblock %}

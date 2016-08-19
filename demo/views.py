@@ -12,7 +12,7 @@ import sys
 
 def mysqlgroup(username):
     try:
-        c = MySQLdb.connect(host='localhost', user='cmdb', passwd='cmdb', db='cmdb', port=3306)
+        c = MySQLdb.connect(host='localhost', user='cmdb', passwd='cmdb', db='cmdb', port=3306, charset='utf8')
         cur = c.cursor()
         sql = 'select c.name from auth_user as a,auth_user_groups as b,auth_group as c where a.id=b.user_id and b.group_id = c.id and a.username="%s";' % username
         cur.execute(sql)
@@ -68,7 +68,7 @@ def project_cost(on, tw, projectid):
     one = on.replace('-', '', 2)
     two = tw.replace('-', '', 2)
     sql = 'select date,money from server_costs where date between "%s" and "%s" and projectId = %s;' % (
-    one, two, projectid)
+        one, two, projectid)
     t = mysqlselect(sql)
     d = []
     l = []
@@ -92,7 +92,7 @@ def project_costline(on, tw, projectid):
     one = on.replace('-', '', 2)
     two = tw.replace('-', '', 2)
     sql = 'select date,money from server_costs where date between "%s" and "%s" and projectId = %s;' % (
-    one, two, projectid)
+        one, two, projectid)
     t = mysqlselect(sql)
     d = []
     l = []
@@ -107,7 +107,7 @@ def project_costtable(on, tw, projectid):
     one = on.replace('-', '', 2)
     two = tw.replace('-', '', 2)
     sql = 'select date,money from server_costs where date between "%s" and "%s" and projectId = %s;' % (
-    one, two, projectid)
+        one, two, projectid)
     t = mysqlselect(sql)
     d = []
     l = []
@@ -142,7 +142,7 @@ def weblogin(request):
         if group == 'admin':
             return HttpResponseRedirect('/update/')
         else:
-            return HttpResponseRedirect('/baruser/')
+            return HttpResponseRedirect('/program/')
 
     else:
         return render_to_response('error.html')
@@ -151,7 +151,7 @@ def weblogin(request):
 @login_required(login_url="")
 def weblogout(request):
     logout(request)
-    return  render_to_response("index.html")
+    return render_to_response("index.html")
 
 
 @login_required(login_url="")
@@ -182,60 +182,122 @@ def update(request):
                                'username': username, 'one': one, 'two': two, 'projectname': name,
                                'program': json.dumps(project_name)})
 
+
 @login_required(login_url="")
 def line(request):
     name = project_info()
+    username = request.user.username
+    group = mysqlgroup(username)
     if request.method == 'POST':
         one = request.POST['one']
         two = request.POST['two']
-        projectid = request.POST['three']
+        if group == 'admin':
+            projectid = request.POST['three']
+            selectable = " "
+        else:
+            projectid = dictkey(group, name)
+            selectable = 'disabled'
         labels, dataline = project_costline(one, two, projectid)
         end = 1000000
         scale = 200000
-        t = int(projectid)
-        project_name = name[t]
-        projectid = t
-
+        project_name = name[projectid]
     else:
         one = '2016-01-01'
         two = '2016-09-01'
-        projectid = '1000330'
+        if group == 'admin':
+            projectid = 1000330
+            selectable = " "
+        else:
+            projectid = dictkey(group, name)
+            selectable = 'disabled'
         labels, dataline = project_costline(one, two, projectid)
-        print labels
-        print dataline
         end = 1000000
         scale = 200000
-        t = 1000330
-        project_name = name[t]
-        projectid = t
-
+        project_name = name[projectid]
+    print group
+    print project_name
     return render_to_response('line.html',
                               {'flow': json.dumps(dataline), 'labels': json.dumps(labels), 'end': json.dumps(end),
                                'scale': json.dumps(scale),
                                'one': one, 'two': two, 'projectname': name, 'program': json.dumps(project_name),
-                               'projectid': projectid})
+                               'projectid': projectid, 'selectable': selectable})
+
 
 @login_required(login_url="")
 def table(request):
     name = project_info()
+    username = request.user.username
+    group = mysqlgroup(username)
     if request.method == 'POST':
         one = request.POST['one']
         two = request.POST['two']
-        projectid = request.POST['three']
+        if group == 'admin':
+            projectid = request.POST['three']
+            selectable = " "
+        else:
+            projectid = dictkey(group, name)
+            selectable = 'disabled'
         fee = project_costtable(one, two, projectid)
-        t = int(projectid)
-        project_name = name[t]
-        projectid = t
+        project_name = name[projectid]
     else:
         one = '2016-01-01'
         two = '2016-09-01'
-        projectid = '1000330'
+        if group == 'admin':
+            projectid = 1000330
+            selectable = " "
+        else:
+            projectid = dictkey(group, name)
+            selectable = 'disabled'
         fee = project_costtable(one, two, projectid)
-        t = 1000330
-        project_name = name[t]
-        projectid = t
-    return render_to_response('table.html', {'dat': fee, 'program': project_name, 'one': one, 'two': two, 'projectid': projectid, 'projectname': name})
+        project_name = name[projectid]
+    return render_to_response('table.html',
+                              {'dat': fee, 'program': project_name, 'one': one, 'two': two, 'projectid': projectid,
+                               'projectname': name, 'selectable': selectable})
+
 
 @login_required(login_url="")
 def information(request):
-    return render_to_response('information.html')
+    name = project_info()
+    username = request.user.username
+    group = mysqlgroup(username)
+    if group == 'admin':
+        if request.method == 'POST':
+            projectid = request.POST['three']
+
+        else:
+            projectid = 1000330
+        display = ''
+        projectname = name[projectid]
+    else:
+        projectid = dictkey(group, name)
+        projectname = group
+        display = 'display:none;'
+    return render_to_response('information.html', {'projectname': name, 'program': projectname, 'projectid': projectid, 'display': display})
+
+
+def dictkey(i, d):
+    for k, v in d.items():
+        if v == i:
+            return k
+
+
+def program(request):
+    username = request.user.username
+    group = mysqlgroup(username)
+    name = project_info()
+    projectid = dictkey(group, name)
+    print username
+    print group
+    print projectid
+    if request.method == 'POST':
+        one = request.POST['one']
+        two = request.POST['two']
+
+    else:
+        one = '2016-01-01'
+        two = '2016-09-01'
+    data = project_cost(one, two, projectid)
+    print data
+    return render_to_response('program.html',
+                              {'cost': json.dumps(data), 'username': username, 'program': group, 'one': one,
+                               'two': two})

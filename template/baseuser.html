@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<!--<meta http-equiv="refresh" content="20">-->
+        <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+		<title>成本管理</title>
+		<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+		<script src='/static/js/ichart.1.2.1.min.js'></script>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+        <script src="/static/layer/layer.js"></script>
+        <script src="/static/laydate/laydate.js"></script>
+
+{% block barcanv %}
+        {% endblock %}
+
+</head>
+
+
+
+
+<body style='background-color:#fcfcfc;'>
+
+
+
+<div class="panel panel-primary">
+<div class="panel-heading">
+<h3 class="panel-title"><span><img src="/static/img/logo.png" alt="logo"></span>
+    <div class="btn-group pull-right" style="background-color: aliceblue">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;<span class="hidden-phone" style="font-weight: 200">{{ username }}</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="/logout/">Logout</a></li>
+                </ul>
+           </div>
+</h3>
+
+
+
+</div>
+<div class="panel-body">
+	<div id="content" class="row-fluid">
+        <div class="col-md-2 well">
+     		<ul class="nav nav-pills nav-stacked">
+         		<li class="active"><a href="#"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;游戏项目费用总览</a></li>
+  		 		<li><a href="#">表格显示</a></li>
+		 		<li><a href="#">项目信息</a></li>
+   				<li><a href="#">联系</a></li>
+   				<li><a href="#">展示</a></li>
+   				<li><a href="#">测试</a></li>
+                <li><a href="/excel/"><span class="glyphicon glyphicon-th"></span>&nbsp;导出数据EXCEL表</a></li>
+			</ul>
+        </div>
+
+        <div class="col-md-10 well" >
+
+                {% block body %}
+                {% endblock %}
+
+        </div>
+</div>
+
+</div>
+</div>
+<script>
+
+$('#haha').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '曲线图展示',
+                shadeClose: true,
+                offset: 'rb',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '600px'],
+                content: '/line/',
+                shift: 9
+            });
+});
+
+</script>
+
+<script>
+
+$('#hao').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '表格',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/table/',
+                shift: 9
+            });
+});
+
+</script>
+
+
+<script>
+
+$('#xiangmu').click(function() {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '项目信息',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/information/',
+                shift: 9
+            });
+});
+
+</script>
+
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+<script>
+laydate.skin('danlan')
+laydate({
+    elem: '#hello1', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+    event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+
+});
+</script>
+
+
+</style>>
+
+
+</body>
+
+
+</html>

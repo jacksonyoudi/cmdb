@@ -27,6 +27,9 @@ urlpatterns = patterns('',
                        url(r'^information/$', information),
                        url(r'^$', index),
                        url(r'^login/$', weblogin),
-                       url(r'^weblogout/$', weblogout),
+                       url(r'^logout/$', weblogout),
+                       url(r'^program/$', program),
+                       url(r'^showall/$', update),
+
 
 )

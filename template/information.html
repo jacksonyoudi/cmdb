@@ -8,9 +8,24 @@
   <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+        <form action="/table/" method="post" id="formid">
+            &nbsp;&nbsp;&nbsp;
+                <select name="three" id="selectone" style={{ display }}  class="form-control input-small">
+             <% request.setCharacterEncoding("utf-8");%>
+             <option value="所有游戏业务项目" {{ all }}>所有游戏业务项目</option>
+                    {% for key,value in projectname.items %}
+			{% ifequal key  projectid %}
+             <option value={{ key }}   selected="selected" >{{ value }}</option>
+			{% else %}
+				<option value={{ key }}  >{{ value }}</option>
+			{% endifequal %}
+                    {% endfor %}
+                    </select>
+            <button type="submit" class="btn btn-primary" style="display: none"></button>
+            </form>
 <table class="bordered">
     <thead>
-    <tr><th colspan="3" align="center"><h5 align="center"> 项目名称</h5></th></tr>
+    <tr><th colspan="3" align="center"><h5 align="center">{{ program }}</h5></th></tr>
     <tr>
         <th>项目</th>
         <th>数量</th>
@@ -44,9 +59,6 @@
 
  });
 </script>
-
-
-
 
 
 <style type="text/css">
