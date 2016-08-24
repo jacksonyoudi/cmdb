@@ -12,7 +12,7 @@
             &nbsp;&nbsp;&nbsp;
                 <select name="three" {{ selectable }} id="selectone">
              <% request.setCharacterEncoding("utf-8");%>
-             <option value="所有游戏业务项目" {{ all }}>所有游戏业务项目</option>
+             <!--<option value="所有游戏业务项目" {{ all }}>所有游戏业务项目</option>-->
                     {% for key,value in projectname.items %}
 			{% ifequal key  projectid %}
              <option value={{ key }}   selected="selected" >{{ value }}</option>

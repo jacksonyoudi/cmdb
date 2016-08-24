@@ -1,4 +1,6 @@
 # Create your views here.
+# coding: utf8
+
 from django.shortcuts import render, render_to_response, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
@@ -14,12 +16,15 @@ def mysqlgroup(username):
     try:
         c = MySQLdb.connect(host='localhost', user='cmdb', passwd='cmdb', db='cmdb', port=3306, charset='utf8')
         cur = c.cursor()
-        sql = 'select c.name from auth_user as a,auth_user_groups as b,auth_group as c where a.id=b.user_id and b.group_id = c.id and a.username="%s";' % username
+        sql = "select  d.name from auth_group as d,(select a.group_id from auth_user_groups as a,(select id from auth_user where username = '%s') as b where a.user_id = b.id) as c where d.id = c.group_id ; " % username
         cur.execute(sql)
         t = cur.fetchall()
         cur.close()
         c.close()
-        return t[0][0]
+        a = []
+        for i in t:
+            a.append(i[0])
+        return a
     except Exception, e:
         print e
 
@@ -139,7 +144,7 @@ def weblogin(request):
         username = user.username
         group = mysqlgroup(username)
 
-        if group == 'admin':
+        if group[0] == 'admin':
             return HttpResponseRedirect('/update/')
         else:
             return HttpResponseRedirect('/program/')
@@ -185,42 +190,46 @@ def update(request):
 
 @login_required(login_url="")
 def line(request):
-    name = project_info()
+    name = project_info()  # 所有项目字典
     username = request.user.username
-    group = mysqlgroup(username)
+    group = mysqlgroup(username)  # 用户所属组的列表
+    id_list = dictkey(group, name)  # 用户对应的 id列表
     if request.method == 'POST':
         one = request.POST['one']
         two = request.POST['two']
-        if group == 'admin':
-            projectid = request.POST['three']
-            selectable = " "
+        projectid = request.POST['three']
+        if group[0] == 'admin':
+            projectname = name  # select遍历
         else:
-            projectid = dictkey(group, name)
-            selectable = 'disabled'
+            projectname = filter_grouplist(id_list, name)  # 普通用户的 select遍历
+
         labels, dataline = project_costline(one, two, projectid)
         end = 1000000
         scale = 200000
-        project_name = name[projectid]
+        projectid = int(projectid)
+        project_name = name[projectid]       # 下标 项目名
+
     else:
         one = '2016-01-01'
         two = '2016-09-01'
-        if group == 'admin':
+        if group[0] == 'admin':
             projectid = 1000330
-            selectable = " "
+            projectname = name
         else:
-            projectid = dictkey(group, name)
-            selectable = 'disabled'
+            projectid = id_list[0]
+            projectid = int(projectid)
+            projectname = filter_grouplist(id_list, name)
         labels, dataline = project_costline(one, two, projectid)
         end = 1000000
         scale = 200000
         project_name = name[projectid]
     print group
-    print project_name
+    print projectname
     return render_to_response('line.html',
                               {'flow': json.dumps(dataline), 'labels': json.dumps(labels), 'end': json.dumps(end),
                                'scale': json.dumps(scale),
-                               'one': one, 'two': two, 'projectname': name, 'program': json.dumps(project_name),
-                               'projectid': projectid, 'selectable': selectable})
+                               'one': one, 'two': two, 'projectname': projectname, 'program': json.dumps(project_name),
+                               'projectid': projectid})
 
 
 @login_required(login_url="")
@@ -228,31 +237,33 @@ def table(request):
     name = project_info()
     username = request.user.username
     group = mysqlgroup(username)
+    id_list = dictkey(group, name)
     if request.method == 'POST':
         one = request.POST['one']
         two = request.POST['two']
-        if group == 'admin':
-            projectid = request.POST['three']
-            selectable = " "
+        projectid = request.POST['three']
+        if group[0] == 'admin':
+            projectname = name
         else:
-            projectid = dictkey(group, name)
-            selectable = 'disabled'
+            projectname = filter_grouplist(id_list, name)
         fee = project_costtable(one, two, projectid)
+        projectid = int(projectid)
         project_name = name[projectid]
     else:
         one = '2016-01-01'
         two = '2016-09-01'
-        if group == 'admin':
+        if group[0] == 'admin':
             projectid = 1000330
-            selectable = " "
+            projectname = name
         else:
-            projectid = dictkey(group, name)
-            selectable = 'disabled'
+            projectid = id_list[0]
+            projectid = int(projectid)
+            projectname = filter_grouplist(id_list, name)
         fee = project_costtable(one, two, projectid)
         project_name = name[projectid]
     return render_to_response('table.html',
                               {'dat': fee, 'program': project_name, 'one': one, 'two': two, 'projectid': projectid,
-                               'projectname': name, 'selectable': selectable})
+                               'projectname': projectname})
 
 
 @login_required(login_url="")
@@ -260,44 +271,65 @@ def information(request):
     name = project_info()
     username = request.user.username
     group = mysqlgroup(username)
-    if group == 'admin':
+    id_list = dictkey(group, name)
+    if group[0] == 'admin':
+        projectname = name
         if request.method == 'POST':
             projectid = request.POST['three']
-
         else:
             projectid = 1000330
-        display = ''
-        projectname = name[projectid]
+        project_name = name[projectid]
     else:
-        projectid = dictkey(group, name)
-        projectname = group
-        display = 'display:none;'
-    return render_to_response('information.html', {'projectname': name, 'program': projectname, 'projectid': projectid, 'display': display})
+        if request.method == 'POST':
+            projectid = request.POST['three']
+        else:
+            projectid = id_list[0]
+        projectid = int(projectid)
+        project_name = name[projectid]
+        projectname = filter_grouplist(id_list, name)
+    return render_to_response('information.html',
+                              {'projectname': projectname, 'program': project_name, 'projectid': projectid})
 
 
 def dictkey(i, d):
-    for k, v in d.items():
-        if v == i:
-            return k
+    a = []
+    for j in i:
+        for k, v in d.items():
+            if v == j:
+                a.append(k)
+    return a
 
 
+def filter_grouplist(l, d):
+    a = {}
+    for i in l:
+        a[i] = d[i]
+    return a
+
+@login_required(login_url="")
 def program(request):
     username = request.user.username
     group = mysqlgroup(username)
     name = project_info()
-    projectid = dictkey(group, name)
+    id_list = dictkey(group, name)
+    projectname = filter_grouplist(id_list, name)
     print username
     print group
-    print projectid
+
     if request.method == 'POST':
         one = request.POST['one']
         two = request.POST['two']
-
+        projectid = request.POST['three']
     else:
         one = '2016-01-01'
         two = '2016-09-01'
+        projectid = id_list[0]
+    projectid = int(projectid)
+    groupname = name[int(projectid)]
     data = project_cost(one, two, projectid)
     print data
+    print projectname
+    print projectid
     return render_to_response('program.html',
                               {'cost': json.dumps(data), 'username': username, 'program': group, 'one': one,
-                               'two': two})
+                               'two': two, 'projectname': projectname, 'groupname': json.dumps(groupname), 'projectid':projectid})

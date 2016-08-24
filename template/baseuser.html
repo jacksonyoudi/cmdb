@@ -46,8 +46,8 @@
         <div class="col-md-2 well">
      		<ul class="nav nav-pills nav-stacked">
          		<li class="active"><a href="#"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;游戏项目费用总览</a></li>
-  		 		<li><a href="#">表格显示</a></li>
-		 		<li><a href="#">项目信息</a></li>
+  		 		<li><a href="#" onclick="table_method()">表格显示</a></li>
+		 		<li><a href="#" onclick="information_method()">项目信息</a></li>
    				<li><a href="#">联系</a></li>
    				<li><a href="#">展示</a></li>
    				<li><a href="#">测试</a></li>
@@ -104,6 +104,7 @@ $('#hao').click(function() {
 </script>
 
 
+
 <script>
 
 $('#xiangmu').click(function() {
@@ -140,9 +141,47 @@ laydate({
 });
 </script>
 
+<script>
+ $("#selectone").change(function(){
+      document.getElementById('formid').submit()
 
-</style>>
+ });
+</script>
+<script>
+    function table_method()
+    {
+          layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '表格',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/table/',
+                shift: 9
+            });
 
+    };
+     function information_method()
+    {
+    layer.open({
+                type: 2,
+                skin:'ayui-layer-molv',
+                title: '项目信息',
+                shadeClose: true,
+                offset: 'r',
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['800px', '800px'],
+                content: '/information/',
+                shift: 9
+            });
+
+    };
+
+</script>
 
 </body>
 
